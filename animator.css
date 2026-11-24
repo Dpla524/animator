@@ -1,0 +1,425 @@
+/* All styling for the Animator app. The .gleam files only attach class names. */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+/* ── Layout: two columns ─────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a2e;
+  color: #d4c5a0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+}
+
+/* Left column: the code editor. */
+.code-col {
+  width: 42%;
+  min-width: 320px;
+  max-width: 720px;
+  flex-shrink: 0;
+  display: flex;
+  border-right: 1px solid #3a3a5e;
+  background: #0f0f1e;
+}
+
+/* The code column stays in the DOM when collapsed, so CodeMirror keeps its
+   state; hiding it gives the right column the full width. */
+.app.code-hidden .code-col { display: none; }
+
+/* A small emoji button (the code pane's collapse toggle, and the playback
+   controls once they exist). */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2a2a4a;
+  color: #d4c5a0;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 5px 8px;
+}
+.icon-btn:hover { background: #3a3a5e; }
+
+/* ── Code panel (left column) ───────────────────────────────────────────── */
+
+.code-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #1a1a3e;
+  border-bottom: 1px solid #3a3a5e;
+}
+.code-title {
+  color: #e8d8b0;
+  font-family: 'Georgia', serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+/* The drawing library menu, in the code header. */
+.drawing-menu {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+.drawing-menu-label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.drawing-menu-name {
+  color: #8a8aca;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.drawing-select {
+  flex: 1;
+  min-width: 0;
+  background: #0d0d1a;
+  color: #e8d8b0;
+  border: 1px solid #3a3a5e;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 13px;
+}
+.code-header .icon-btn { flex-shrink: 0; }
+
+/* Wrapper holding the editor. */
+.code-editor-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+/* CodeMirror mount node: grows to fill the panel. */
+.code-editor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  background: #0d0d1a;
+}
+.code-editor .cm-editor { width: 100%; height: 100%; }
+
+/* Collapsible reference of the built-ins available to draw functions. */
+.reference {
+  margin: 8px 14px 0;
+  border: 1px solid #3a3a5e;
+  border-radius: 4px;
+  background: #0d0d1a;
+  overflow: hidden;
+}
+.reference-summary {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #b8a888;
+  font-family: monospace;
+  font-size: 12px;
+  user-select: none;
+}
+.reference-summary:hover { color: #e8d8b0; }
+.reference-body {
+  padding: 4px 12px 10px;
+  border-top: 1px solid #3a3a5e;
+}
+.reference-group { margin-top: 8px; }
+.reference-group-title {
+  color: #8a8aca;
+  font-family: monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.reference-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 1px 0;
+}
+.reference-sig {
+  color: #89ddff;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre;
+}
+.reference-desc { color: #6a7a8a; font-size: 11px; }
+
+/* ── Animation area (right column) ──────────────────────────────────────── */
+
+.canvas-area {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a14;
+  container-type: size;
+}
+
+/* A parse or evaluation error, overlaid on the canvas so the square stays put. */
+.canvas-error {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 84px;
+  z-index: 5;
+  max-height: 38%;
+  margin: 0;
+  padding: 12px 14px;
+  overflow: auto;
+  border: 1px solid #6e3040;
+  border-radius: 8px;
+  background: rgba(42, 16, 24, 0.92);
+  color: #ffc1c8;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* The interpreter's List(Path) (or its error), shown as text before the
+   animation pane is built. */
+.output {
+  align-self: stretch;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cfe3ff;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+/* Leave room for the reveal button, which only overlays this pane while the
+   code column is hidden. */
+.app.code-hidden .output { padding-top: 48px; }
+
+/* Button that reveals the code column again when it is hidden. */
+.reveal-code {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+}
+
+/* A centred square that fits the (possibly non-square) animation area. Give your
+   <canvas> this class, so that drawings aren't stretched. */
+.canvas {
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+}
+
+/* The drawing and the Ink Courier overlay share one square. */
+.stage {
+  position: relative;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+}
+.stage:focus { outline: 1px solid #6a6aaa; }
+.stage .canvas,
+.stage .game-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.game-canvas { pointer-events: none; }
+
+.ride-hud {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  max-width: 70%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 15, 30, 0.88);
+  border: 1px solid #3a3a5e;
+  color: #ffe08a;
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Best finished rides. Stays in the top-right of the drawing. */
+.high-scores {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 8;
+  width: 132px;
+  padding: 2px;
+  border-radius: 8px;
+  background: #3a4a62;
+  overflow: hidden;
+  pointer-events: none;
+}
+.high-scores-glow {
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  opacity: 0;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 224, 138, 0) 0deg,
+    rgba(255, 224, 138, 0) 248deg,
+    #fff6c8 308deg,
+    #ffe08a 332deg,
+    rgba(255, 224, 138, 0) 360deg
+  );
+}
+.high-scores.lit {
+  animation: high-halo 2.4s ease-out;
+}
+.high-scores.lit .high-scores-glow {
+  animation: high-sweep 1.15s linear 2, high-fade 2.4s ease-out forwards;
+}
+.high-scores-body {
+  position: relative;
+  z-index: 1;
+  border-radius: 7px;
+  background: rgba(8, 12, 24, 0.94);
+  padding: 7px 9px 8px;
+}
+.high-kicker {
+  margin-bottom: 1px;
+  color: #ffe08a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.high-title {
+  margin-bottom: 4px;
+  overflow: hidden;
+  color: #9eb4cc;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.high-scores ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.high-scores li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #c5d7ea;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+.high-scores li.empty { color: #6a7a8a; }
+.high-scores li .place { color: #7f93a8; }
+.high-scores li.new,
+.high-scores li.new .place { color: #fff6d0; }
+
+@keyframes high-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes high-fade {
+  0%, 72% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes high-halo {
+  0% { box-shadow: 0 0 16px 2px rgba(255, 224, 138, 0.95); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 224, 138, 0); }
+}
+
+.ride-btn {
+  background: #2a2a4a;
+  color: #ffe08a;
+  border: 1px solid #6a5a30;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+.ride-btn:hover { background: #3a3a5e; }
+.ride-btn.on {
+  background: #6a4a16;
+  color: #fff6d8;
+  border-color: #ffe08a;
+}
+
+/* Shape and speed. Sits over the canvas so both inputs are visible on open. */
+.playback {
+  position: absolute;
+  z-index: 6;
+  left: 16px;
+  right: 16px;
+  bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #3a3a5e;
+  border-radius: 8px;
+  background: rgba(15, 15, 30, 0.92);
+}
+
+.slider-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 160px;
+  color: #d4c5a0;
+  font-size: 12px;
+}
+
+.slider-name { width: 3.2em; }
+
+.slider-field input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: #89ddff;
+}
+
+.slider-value {
+  width: 3.4em;
+  text-align: right;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: #cfe3ff;
+}
+
